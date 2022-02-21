@@ -9,7 +9,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
-import net.iesseveroochoa.fernandomartinezperez.practica7.domain.Empresa;
+import net.iesseveroochoa.fernandomartinezperez.practica7.model.Empresa;
 
 public class EmpresaActivity extends AppCompatActivity {
     private Empresa empresa;

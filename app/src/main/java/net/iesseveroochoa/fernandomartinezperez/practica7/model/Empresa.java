@@ -1,4 +1,4 @@
-package net.iesseveroochoa.fernandomartinezperez.practica7.domain;
+package net.iesseveroochoa.fernandomartinezperez.practica7.model;
 
 import android.net.Uri;
 

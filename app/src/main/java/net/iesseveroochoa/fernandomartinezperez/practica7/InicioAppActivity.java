@@ -1,43 +1,43 @@
 package net.iesseveroochoa.fernandomartinezperez.practica7;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import net.iesseveroochoa.fernandomartinezperez.practica7.domain.Conferencia;
+import net.iesseveroochoa.fernandomartinezperez.practica7.model.Conferencia;
+import net.iesseveroochoa.fernandomartinezperez.practica7.model.Mensaje;
 
 import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
 public class InicioAppActivity extends AppCompatActivity {
-    FirebaseAuth auth;
-    TextView tvSesion;
-    TextView tvVerEmpresa;
-    TextView tvConferenciaIniciada;
-    Button btCerrarSesion;
-    ArrayList<Conferencia> listaConferencias;
-    Spinner spConferencias;
+    private FirebaseAuth auth;
+    private TextView tvSesion;
+    private TextView tvVerEmpresa;
+    private TextView tvConferenciaIniciada;
+    private Button btCerrarSesion;
+    private ArrayList<Conferencia> listaConferencias;
+    private Spinner spConferencias;
+    private Conferencia conferenciaActual;
+    private EditText etMensaje;
+    private String usuario;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +48,12 @@ public class InicioAppActivity extends AppCompatActivity {
         tvConferenciaIniciada =findViewById(R.id.tvConferenciaIniciada);
         btCerrarSesion = findViewById(R.id.btCerrarSesion);
         spConferencias = findViewById(R.id.spConferencias);
+        etMensaje =findViewById(R.id.etMensaje);
 
         auth = FirebaseAuth.getInstance();
         FirebaseUser usrFB = auth.getCurrentUser();
-        tvSesion.setText(usrFB.getEmail());
+        usuario = usrFB.getEmail();
+        tvSesion.setText(usuario);
 
         leerConferencias();
         iniciarConferenciasIniciadas();
@@ -111,5 +113,34 @@ public class InicioAppActivity extends AppCompatActivity {
                 Log.d(TAG, "Current data: null");
             }
         });
+    }
+
+    private void enviarMensaje() {
+        String body = etMensaje.getText().toString();
+        if (!body.isEmpty()) {
+
+            Mensaje mensaje = new Mensaje(usuario, body);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection(FirebaseContract.ConferenciaEntry.COLLECTION_NAME)
+
+                    .document(conferenciaActual.getId())
+
+                    .collection(FirebaseContract.ChatEntry.COLLECTION_NAME)
+
+
+                    .add(mensaje);
+            etMensaje.setText("");
+            ocultarTeclado();
+        }
+    }
+    /**
+     * Permite ocultar el teclado
+     */
+    private void ocultarTeclado() {
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(etMensaje.getWindowToken(), 0);
+        }
     }
 }
