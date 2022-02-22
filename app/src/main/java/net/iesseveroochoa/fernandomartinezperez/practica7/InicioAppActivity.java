@@ -39,17 +39,16 @@ public class InicioAppActivity extends AppCompatActivity {
     private String usuario;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio_app);
         tvSesion = findViewById(R.id.tvSesion);
         tvVerEmpresa = findViewById(R.id.tvVerEmpresa);
-        tvConferenciaIniciada =findViewById(R.id.tvConferenciaIniciada);
+        tvConferenciaIniciada = findViewById(R.id.tvConferenciaIniciada);
         btCerrarSesion = findViewById(R.id.btCerrarSesion);
         spConferencias = findViewById(R.id.spConferencias);
-        etMensaje =findViewById(R.id.etMensaje);
+        etMensaje = findViewById(R.id.etMensaje);
 
         auth = FirebaseAuth.getInstance();
         FirebaseUser usrFB = auth.getCurrentUser();
@@ -93,7 +92,12 @@ public class InicioAppActivity extends AppCompatActivity {
     }
 
     private void cargaSpinner() {
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this,R.layout.spinner,listaConferencias);
+        ArrayList<String> nombresConf = new ArrayList<>();
+        for (Conferencia conferencia : listaConferencias) {
+            nombresConf.add(conferencia.getNombre());
+        }
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, R.layout.spinner,nombresConf);
         spConferencias.setAdapter(arrayAdapter);
     }
 
@@ -108,8 +112,8 @@ public class InicioAppActivity extends AppCompatActivity {
             }
             if (snapshot != null && snapshot.exists()) {
                 String
-                        conferenciaIniciada=snapshot.getString(FirebaseContract.ConferenciaIniciadaEntry.CONFERENCIA);
-                tvConferenciaIniciada.setText("C.iniciada: "+conferenciaIniciada);
+                        conferenciaIniciada = snapshot.getString(FirebaseContract.ConferenciaIniciadaEntry.CONFERENCIA);
+                tvConferenciaIniciada.setText("C.iniciada: " + conferenciaIniciada);
                 Log.d(TAG, "Conferencia iniciada: " + snapshot.getData());
             } else {
                 Log.d(TAG, "Current data: null");
@@ -135,6 +139,7 @@ public class InicioAppActivity extends AppCompatActivity {
             ocultarTeclado();
         }
     }
+
     /**
      * Permite ocultar el teclado
      */
