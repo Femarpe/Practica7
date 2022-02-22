@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -92,7 +93,8 @@ public class InicioAppActivity extends AppCompatActivity {
     }
 
     private void cargaSpinner() {
-        //spConferencias.addView();
+        ArrayAdapter arrayAdapter = new ArrayAdapter(this,R.layout.spinner,listaConferencias);
+        spConferencias.setAdapter(arrayAdapter);
     }
 
     private void iniciarConferenciasIniciadas() {
