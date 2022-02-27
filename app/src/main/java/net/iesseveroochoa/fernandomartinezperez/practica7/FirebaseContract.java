@@ -13,7 +13,7 @@ public class FirebaseContract {
     }
 
     public static class ConferenciaEntry {
-        public static final String COLLECTION_NAME = "empresas";
+        public static final String COLLECTION_NAME = "conferencias";
         public static final String ENCURSO = "encurso";
         public static final String FECHA = "fecha";
         public static final String HORARIO = "horario";

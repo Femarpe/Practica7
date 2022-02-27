@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,6 +70,25 @@ public class InicioAppActivity extends AppCompatActivity {
             startActivity(new Intent(this, EmpresaActivity.class));
         });
 
+        spConferencias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                String confSelec = adapterView.getItemAtPosition(position).toString();
+
+                for (Conferencia conf : listaConferencias) {
+
+                    if (confSelec.equals(conf.getNombre())){
+                        tvConferenciaIniciada.setText("la conferencia : "+confSelec);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
     }
 
@@ -97,22 +118,26 @@ public class InicioAppActivity extends AppCompatActivity {
             nombresConf.add(conferencia.getNombre());
         }
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, R.layout.spinner,nombresConf);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, R.layout.spinner, nombresConf);
         spConferencias.setAdapter(arrayAdapter);
     }
 
     private void iniciarConferenciasIniciadas() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         final DocumentReference docRef =
-                db.collection(FirebaseContract.ConferenciaIniciadaEntry.COLLECTION_NAME).document(FirebaseContract.ConferenciaIniciadaEntry.ID);
+                db.collection(FirebaseContract.ConferenciaIniciadaEntry.COLLECTION_NAME)
+                        .document(FirebaseContract.ConferenciaIniciadaEntry.ID);
+
         docRef.addSnapshotListener((snapshot, e) -> {
             if (e != null) {
                 Log.w(TAG, "Listen failed.", e);
                 return;
             }
             if (snapshot != null && snapshot.exists()) {
-                String
-                        conferenciaIniciada = snapshot.getString(FirebaseContract.ConferenciaIniciadaEntry.CONFERENCIA);
+                String conferenciaIniciada = snapshot.getString(FirebaseContract
+                        .ConferenciaIniciadaEntry.CONFERENCIA);
+
                 tvConferenciaIniciada.setText("C.iniciada: " + conferenciaIniciada);
                 Log.d(TAG, "Conferencia iniciada: " + snapshot.getData());
             } else {
