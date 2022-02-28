@@ -1,7 +1,11 @@
 package net.iesseveroochoa.fernandomartinezperez.practica7;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,12 +19,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.firebase.ui.common.ChangeEventType;
+import com.firebase.ui.firestore.ChangeEventListener;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import net.iesseveroochoa.fernandomartinezperez.practica7.adapter.ChatAdapter;
 import net.iesseveroochoa.fernandomartinezperez.practica7.model.Conferencia;
 import net.iesseveroochoa.fernandomartinezperez.practica7.model.Mensaje;
 
@@ -39,7 +50,8 @@ public class InicioAppActivity extends AppCompatActivity {
     private Conferencia conferenciaActual;
     private EditText etMensaje;
     private String usuario;
-
+    RecyclerView rvChat;
+    ChatAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +68,9 @@ public class InicioAppActivity extends AppCompatActivity {
         FirebaseUser usrFB = auth.getCurrentUser();
         usuario = usrFB.getEmail();
         tvSesion.setText(usuario);
+
+        rvChat=findViewById(R.id.rvChat);
+        rvChat.setLayoutManager(new LinearLayoutManager(this));
 
         leerConferencias();
         iniciarConferenciasIniciadas();
@@ -77,8 +92,15 @@ public class InicioAppActivity extends AppCompatActivity {
 
                 for (Conferencia conf : listaConferencias) {
 
-                    if (confSelec.equals(conf.getNombre())){
-                        tvConferenciaIniciada.setText("la conferencia : "+confSelec);
+                    if (confSelec.equals(conf.getNombre())) {
+                        tvConferenciaIniciada.setText("la conferencia : " + confSelec);
+
+                        AlertDialog.Builder builder =
+                                new AlertDialog.Builder(InicioAppActivity.this);
+                        builder.setMessage(confSelec).setTitle("la conferencia : ")
+                                .setPositiveButton("Ok", (dialog, id) -> {
+                                    dialog.cancel();});
+                        builder.show();
                     }
 
                 }
@@ -89,6 +111,8 @@ public class InicioAppActivity extends AppCompatActivity {
 
             }
         });
+
+
 
     }
 
@@ -175,4 +199,48 @@ public class InicioAppActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(etMensaje.getWindowToken(), 0);
         }
     }
+
+    private void defineAdaptador() {
+        Query query = FirebaseFirestore.getInstance()
+                .collection(FirebaseContract.ConferenciaEntry.COLLECTION_NAME)
+                .document(conferenciaActual.getId())
+                .collection(FirebaseContract.ChatEntry.COLLECTION_NAME)
+                .orderBy(FirebaseContract.ChatEntry.FECHA_CREACION,
+                        Query.Direction.DESCENDING);
+        FirestoreRecyclerOptions<Mensaje> options = new
+                FirestoreRecyclerOptions.Builder<Mensaje>()
+                .setQuery(query, Mensaje.class)
+                .setLifecycleOwner(this)
+                .build();
+
+        if (adapter != null) {
+            adapter.stopListening();
+        }
+        adapter = new ChatAdapter(options);
+
+        rvChat.setAdapter(adapter);
+
+        adapter.startListening();
+
+        adapter.getSnapshots().addChangeEventListener(new ChangeEventListener() {
+            @Override
+            public void onChildChanged(@NonNull ChangeEventType type, @NonNull
+                    DocumentSnapshot snapshot, int newIndex, int oldIndex) {
+                rvChat.smoothScrollToPosition(0);
+            }
+            @Override
+            public void onDataChanged() {
+            }
+            @Override
+            public void onError(@NonNull FirebaseFirestoreException e) {
+            }
+        });
+    }
+    //es necesario parar la escucha
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
 }

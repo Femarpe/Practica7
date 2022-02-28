@@ -2,7 +2,11 @@ package net.iesseveroochoa.fernandomartinezperez.practica7;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.compose.foundation.layout.Direction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +17,17 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.firebase.ui.common.ChangeEventType;
+import com.firebase.ui.firestore.ChangeEventListener;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.core.Query;
+
+import net.iesseveroochoa.fernandomartinezperez.practica7.adapter.ChatAdapter;
+import net.iesseveroochoa.fernandomartinezperez.practica7.model.Mensaje;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseAuth auth;
@@ -23,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         comprobarAutenticacion();
+
 
     }
 
@@ -59,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    public void getConferenciaActual(){
+
+    }
+
     public void createSignInIntent() {
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
@@ -77,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
             createSignInIntent();
         }
     }
+
+
 
 
 }
