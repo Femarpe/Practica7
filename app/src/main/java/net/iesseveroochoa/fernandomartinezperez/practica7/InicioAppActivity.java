@@ -50,9 +50,10 @@ public class InicioAppActivity extends AppCompatActivity {
     private Conferencia conferenciaActual;
     private EditText etMensaje;
     private String usuario;
+    Button  btEnviar;
     RecyclerView rvChat;
     ChatAdapter adapter;
-
+    String confSelec;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +64,7 @@ public class InicioAppActivity extends AppCompatActivity {
         btCerrarSesion = findViewById(R.id.btCerrarSesion);
         spConferencias = findViewById(R.id.spConferencias);
         etMensaje = findViewById(R.id.etMensaje);
-
+        btEnviar = findViewById(R.id.btEnviar);
         auth = FirebaseAuth.getInstance();
         FirebaseUser usrFB = auth.getCurrentUser();
         usuario = usrFB.getEmail();
@@ -74,6 +75,10 @@ public class InicioAppActivity extends AppCompatActivity {
 
         leerConferencias();
         iniciarConferenciasIniciadas();
+
+        btEnviar.setOnClickListener(view -> {
+            enviarMensaje();
+        });
 
         btCerrarSesion.setOnClickListener(view -> {
             auth.signOut();
@@ -88,22 +93,7 @@ public class InicioAppActivity extends AppCompatActivity {
         spConferencias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                String confSelec = adapterView.getItemAtPosition(position).toString();
-
-                for (Conferencia conf : listaConferencias) {
-
-                    if (confSelec.equals(conf.getNombre())) {
-                        tvConferenciaIniciada.setText("la conferencia : " + confSelec);
-
-                        AlertDialog.Builder builder =
-                                new AlertDialog.Builder(InicioAppActivity.this);
-                        builder.setMessage(confSelec).setTitle("la conferencia : ")
-                                .setPositiveButton("Ok", (dialog, id) -> {
-                                    dialog.cancel();});
-                        builder.show();
-                    }
-
-                }
+                conferenciaActual = listaConferencias.get(position);
             }
 
             @Override
@@ -112,6 +102,24 @@ public class InicioAppActivity extends AppCompatActivity {
             }
         });
 
+
+
+    }
+
+    private void mostrarDatosConferenccias(){
+
+
+
+
+         if (confSelec.equals(conferenciaActual.getNombre())) {
+
+         AlertDialog.Builder builder =
+         new AlertDialog.Builder(InicioAppActivity.this);
+         builder.setMessage(confSelec).setTitle("la conferencia : ")
+         .setPositiveButton("Ok", (dialog, id) -> {
+         dialog.cancel();});
+         builder.show();
+         }
 
 
     }
@@ -142,7 +150,8 @@ public class InicioAppActivity extends AppCompatActivity {
             nombresConf.add(conferencia.getNombre());
         }
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, R.layout.spinner, nombresConf);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresConf);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         spConferencias.setAdapter(arrayAdapter);
     }
 

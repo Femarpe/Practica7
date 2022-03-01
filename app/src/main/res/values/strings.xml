@@ -3,4 +3,5 @@
     <string name="cerrarsesion">CERRAR SESION</string>
     <string name="vacio">" "</string>
     <string name="verempresa">Ver datos de empresa</string>
+    <string name="conini">Conferencia Iniciada:</string>
 </resources>
